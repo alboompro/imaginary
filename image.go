@@ -60,6 +60,43 @@ func Info(buf []byte, o ImageOptions) (Image, error) {
 	return image, nil
 }
 
+func ResizeBoom(buf []byte, o ImageOptions) (Image, error) {
+	if o.Width == 0 && o.Height == 0 {
+		return Image{}, NewError("Missing required param: height or width", BadRequest)
+	}
+
+	var factor float64
+
+
+	if s, err := bimg.Size(buf); err == nil && !o.Force {
+
+		if o.Width > 0 {
+			factor = float64(o.Width) / float64(s.Width)
+		}
+
+		if fh := float64(o.Height) / float64(s.Height); (o.Height > 0) && (factor == 0 || fh < factor) {
+			factor = fh
+		}
+
+		o.Width = int(float64(s.Width) * factor)
+		o.Height = int(float64(s.Height) * factor)
+
+	}
+
+	opts := BimgOptions(o)
+	opts.Embed = true
+
+	if factor > 1 {
+		opts.Enlarge = true
+	}
+
+	if o.NoCrop == false {
+		opts.Crop = true
+	}
+
+	return Process(buf, opts)
+}
+
 func Resize(buf []byte, o ImageOptions) (Image, error) {
 	if o.Width == 0 && o.Height == 0 {
 		return Image{}, NewError("Missing required param: height or width", BadRequest)
@@ -100,6 +137,33 @@ func Extract(buf []byte, o ImageOptions) (Image, error) {
 	opts.Left = o.Left
 	opts.AreaWidth = o.AreaWidth
 	opts.AreaHeight = o.AreaHeight
+
+	return Process(buf, opts)
+}
+
+func CropBoom(buf []byte, o ImageOptions) (Image, error) {
+	if o.Width == 0 && o.Height == 0 {
+		return Image{}, NewError("Missing required param: height or width", BadRequest)
+	}
+
+	var factor float64
+
+	if s, err := bimg.Size(buf); err == nil {
+		if o.Width > 0 {
+			factor = float64(o.Width) / float64(s.Width)
+		}
+
+		if fh := float64(o.Height) / float64(s.Height); (o.Height > 0) && (factor == 0 || fh < factor) {
+			factor = fh
+		}
+	}
+
+	opts := BimgOptions(o)
+	opts.Crop = true
+
+	if factor > 1 {
+		opts.Enlarge = true
+	}
 
 	return Process(buf, opts)
 }

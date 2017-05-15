@@ -69,10 +69,10 @@ func NewServerMux(o ServerOptions) http.Handler {
 	mux.Handle(join(o, "/health"), Middleware(healthController, o))
 
 	image := ImageMiddleware(o)
-	mux.Handle(join(o, "/resize"), image(Resize))
+	mux.Handle(join(o, "/resize"), image(ResizeBoom))
 	mux.Handle(join(o, "/enlarge"), image(Enlarge))
 	mux.Handle(join(o, "/extract"), image(Extract))
-	mux.Handle(join(o, "/crop"), image(Crop))
+	mux.Handle(join(o, "/crop"), image(CropBoom))
 	mux.Handle(join(o, "/rotate"), image(Rotate))
 	mux.Handle(join(o, "/flip"), image(Flip))
 	mux.Handle(join(o, "/flop"), image(Flop))

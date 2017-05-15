@@ -1,7 +1,7 @@
 # Start from a Debian image with the latest version of Go installed
 # and a workspace (GOPATH) configured at /go.
 FROM marcbachmann/libvips:latest
-MAINTAINER tomas@aparicio.me
+MAINTAINER Welington Sampaio <lelo@alboompro.com>
 
 # Server port to listen
 ENV PORT 9000
@@ -31,10 +31,11 @@ WORKDIR $GOPATH
 
 # Fetch the latest version of the package
 RUN go get -u golang.org/x/net/context
-RUN go get -u github.com/h2non/imaginary
+RUN go get -u github.com/alboompro/imaginary
 
 # Run the outyet command by default when the container starts.
 ENTRYPOINT ["/go/bin/imaginary"]
+#ENTRYPOINT ["/bin/sh"]
 
 # Expose the server TCP port
 EXPOSE 9000
